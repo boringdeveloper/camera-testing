@@ -7,6 +7,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 })
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('video') video: any;
+  private stream: MediaStream = new MediaStream();
   track: any;
   cameras: any;
   videoConstraints: MediaStreamConstraints = { video: true, audio: false };
@@ -18,11 +19,15 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    
+    this.stream.getTracks().forEach(track => {
+      track.stop();
+    });
   }
 
   initVideo() {
     this.getMediaStream().then((stream) => {
+      this.stream = stream;
+
       if (!this.cameras) {
         navigator.mediaDevices.enumerateDevices().then((devices) => {
           this.cameras = devices.filter((device) => device.kind == 'videoinput');
